@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            font-family: cursive;
+            background: #181a20;
+            color: #f5f6fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 150px);
+            grid-template-rows: repeat(3, 150px);
+            gap: 18px;
+            margin: 40px 0 30px 0;
+            background: #23262f;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            padding: 24px;
+        }
+        .cell {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #23262f 60%, #31344b 100%);
+            border: none;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            font-weight: bold;
+            color: #f5f6fa;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            user-select: none;
+        }
+        .cell:hover {
+            background: linear-gradient(135deg, #31344b 60%, #23262f 100%);
+            transform: scale(1.06);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+        }
+        .reset-button {
+            padding: 12px 32px;
+            font-size: 1.15rem;
+            background: linear-gradient(90deg, #23262f 60%, #31344b 100%);
+            color: #f5f6fa;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+        }
+        .reset-button:hover {
+            background: linear-gradient(90deg, #31344b 60%, #23262f 100%);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            transform: scale(1.04);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-board"></div>
+    <button class="reset-button">Reset Game</button>
+    <script>
+        // Select the game board element
+        const board = document.querySelector('.game-board');
+        // Track the current player ('X' or 'O')
+        let currentPlayer = 'X';
+        // Track the winner (null if no winner yet)
+        let winner = null;
+        // Initialize the board cells as an array of 9 nulls
+        const cells = Array(9).fill(null);
+
+        // Check if there is a winner
+        function checkWinner() {
+            const winConditions = [
+                [0, 1, 2], // rows
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6], // columns
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8], // diagonals
+                [2, 4, 6]
+            ];
+            for (const condition of winConditions) {
+                const [a, b, c] = condition;
+                if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
+                    return cells[a];
+                }
+            }
+            return null;
+        }
+
+        // Handle a cell click event
+        function handleCellClick(index) {
+            // Ignore click if cell is already filled or game is over
+            if (cells[index] || winner) return;
+
+            // Set the cell to the current player's symbol
+            cells[index] = currentPlayer;
+            // Check for a winner after the move
+            winner = checkWinner();
+
+            render();
+
+            if (winner) {
+                setTimeout(() => {
+                    alert(`Player ${winner} Wins!`);
+                    resetGame();
+                }, 100);
+            } else if (!cells.includes(null)) {
+                setTimeout(() => {
+                    alert('It\'s a Tie');
+                    resetGame();
+                }, 100);
+            } else {
+                // Switch player
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            }
+        }
+
+        // Render the board UI
+        function render() {
+            board.innerHTML = '';
+            cells.forEach((value, index) => {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.textContent = value || '';
+                cell.addEventListener('click', () => handleCellClick(index));
+                board.appendChild(cell);
+            });
+        }
+
+        // Reset the game state
+        function resetGame() {
+            cells.fill(null);
+            currentPlayer = 'X';
+            winner = null;
+            render();
+        }
+
+        // Add event listener to the reset button
+        document.querySelector('.reset-button').addEventListener('click', resetGame);
+
+        // Initial render
+        render();
+
+        /*
+        Logic Explanation:
+        - The board is a 1D array of 9 elements representing the 3x3 grid.
+        - Players take turns clicking cells; each click fills a cell with 'X' or 'O'.
+        - After each move, checkWinner() checks all win conditions.
+        - If a player wins or the board is full (tie), an alert is shown and the game resets.
+        - The render() function updates the UI to reflect the current board state.
+        */
+    </script>
+</body>
+</html>
